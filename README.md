@@ -3,7 +3,24 @@
 
 <br><br><br>
 
-# CycleGAN and pix2pix in PyTorch
+# Real-time CycleGAN and pix2pix in PyTorch
+
+This repository is based on the official [PyTorch implementation](junyanz/pytorch-CycleGAN-and-pix2pix
+) for CycleGAN and expands on it with real-time video translation capabilities.
+
+The original code was written by [Jun-Yan Zhu](https://github.com/junyanz) and [Taesung Park](https://github.com/taesung), with support from [Tongzhou Wang](https://ssnl.github.io/). The credit for the actual CycleGAN and pix2pix code goes to them.
+
+## Usage
+
+The test script is modified to use a video source instead of the filesystem for its images. The only difference in usage is that there is a new (optional) flag to define the video source. If multiple video sources are available, the `--videosource` flag can be used to choose between them.
+
+```
+python test.py --videosource 0 --name style_vangogh_pretrained --model test --no_dropout
+```
+
+**Note:** The `no_dropout` flag is required for compatibility with the trained models.
+
+## Original README
 
 **New**:  Please check out [contrastive-unpaired-translation](https://github.com/taesungp/contrastive-unpaired-translation) (CUT), our new unpaired image-to-image translation model that enables fast and memory-efficient training.
 
