@@ -64,15 +64,31 @@ if __name__ == '__main__':
         src = int(opt.videosource)
 
     webcam = VideoCapture(src)
-    namedWindow("cam-input")
-    namedWindow("cam-output")
+    save_only = False
+    size = (512, 512)
+    out = None
+    if opt.save and os.path.isfile(opt.videosource):
+        #
+        fpath = os.path.abspath(opt.videosource)
+        fname = os.path.basename(fpath).split('.')[0]
+        out_path = os.path.join(os.path.dirname(fpath), f'{fname}_style.mov')
+        #
+        size = (int(webcam.get(cv2.CAP_PROP_FRAME_WIDTH)), int(webcam.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+        fps = webcam.get(cv2.CAP_PROP_FPS)
+        out = VideoWriter(out_path, cv2.VideoWriter_fourcc(*'H264'), fps, size)
+        save_only = True
+    #
+    if not save_only:
+        namedWindow("cam-input")
+        namedWindow("cam-output")
+    #
     while True:
         success, input_image = webcam.read()
         if not success:
             print("Could not get an image. Please check your video source")
             break
-
-        imshow("cam-input", input_image)
+        if not save_only:
+            imshow("cam-input", input_image)
 
         input_image = cv2.resize(input_image, (256, 256))
         input_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2RGB)
@@ -88,13 +104,16 @@ if __name__ == '__main__':
         #print(result_image)
         result_image = util.tensor2im(result_image)
         result_image = cv2.cvtColor(np.array(result_image), cv2.COLOR_RGB2BGR)
-        result_image = cv2.resize(result_image, (512, 512))
-
-        imshow("cam-output", result_image)
+        result_image = cv2.resize(result_image, size)
+        if save_only:
+            out.write(result_image)
+        else:
+            imshow("cam-output", result_image)
 
         k = cv2.waitKey(1)
         if k == 27 or k == ord('q'):
             break
-
-    destroyWindow("cam-input")
-    destroyWindow("cam-output")
+    webcam.release()
+    if save_only:
+        out.release()
+    destroyAllWindows()
